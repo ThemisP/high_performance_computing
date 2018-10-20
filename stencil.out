@@ -1,7 +1,8 @@
-Running on host node31-029
-Time is Mon Oct 15 12:49:20 BST 2018
+Running on host node31-031
+Time is Thu Oct 18 13:24:29 BST 2018
 Directory is /panfs/panasas01/cosc/tp16381
-PBS job ID is 7529210.master.cm.cluster
+PBS job ID is 7553319.master.cm.cluster
 ------------------------------------
- runtime: 2.294001 s
+ runtime: 2.444066 s
 ------------------------------------
+Warning: Permanently added 'node31-031,10.131.0.223' (RSA) to the list of known hosts.

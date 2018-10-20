@@ -49,9 +49,9 @@ int main(int argc, char *argv[]) {
   free(image);
 }
 
-void stencil(const int nx, const int ny, double *  image, double *  tmp_image) {
-  for (int j = 0; j < ny; ++j) {
-    for (int i = 0; i < nx; ++i) {
+void stencil(const int nx, const int ny, double * restrict  image, double * restrict  tmp_image) {
+  for (int i = 0; i < nx; ++i) {
+    for (int j = 0; j < ny; ++j) {
       tmp_image[j+i*ny] = image[j+i*ny] * 0.6;
       if (i > 0)    tmp_image[j+i*ny] += image[j  +(i-1)*ny] * 0.1;
       if (i < nx-1) tmp_image[j+i*ny] += image[j  +(i+1)*ny] * 0.1;
