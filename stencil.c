@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
+#include "mpi.h"
 
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
@@ -12,7 +13,17 @@ void output_image(const char * file_name, const int nx, const int ny, float *ima
 double wtime(void);
 
 int main(int argc, char *argv[]) {
+  int rank,size,flag, strlen;
+  enum bool {FALSE,TRUE};
+  char hostname[MPI_MAX_PROCESSOR_NAME];
 
+  MPI_Init(&argc, &argv);
+  MPI_Initialized(&flag);
+  if(flag!=TRUE){
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+
+  MPI_Comm_rank( MPI_COMM_WORLD, &rank );
   // Check usage
   if (argc != 4) {
     fprintf(stderr, "Usage: %s nx ny niters\n", argv[0]);
@@ -45,8 +56,13 @@ int main(int argc, char *argv[]) {
   printf(" runtime: %lf s\n", toc-tic);
   printf("------------------------------------\n");
 
+  printf("Hello, world; from host %s: process %d of %d\n", hostname, rank, size);
+
   output_image(OUTPUT_FILE, nx, ny, image);
+
   free(image);
+  MPI_Finalize();
+  return EXIT_SUCCESS;
 }
 
 void stencil(const int nx, const int ny, float * restrict image, float * restrict tmp_image) {
