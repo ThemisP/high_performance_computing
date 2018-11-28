@@ -6,14 +6,23 @@
 
 // Define output file name
 #define OUTPUT_FILE "stencil.pgm"
+#define MASTER 0
 
 void stencil(const int nx, const int ny, float *  image, float *  tmp_image);
 void init_image(const int nx, const int ny, float *  image, float *  tmp_image);
 void output_image(const char * file_name, const int nx, const int ny, float *image);
+void startProcess(const int local_ncols, const int local_nrows, float *sendbuf, float *recvbuf, const int up, const int down, int tag, float *local_gridcurrent, float *local_gridnext, MPI_Status status);
 double wtime(void);
 
 int main(int argc, char *argv[]) {
-  int rank,size,flag, strlen;
+  int ii, jj, kk;
+  int rank,size,flag =0,strlen;
+  int tag =0;
+  int up, down;
+  MPI_Status status;
+  int local_nrows, local_ncols, remote_ncols;
+  float *local_gridcurrent, *local_gridnext, *sendbuf, *recvbuf, *printbuf;
+
   enum bool {FALSE,TRUE};
   char hostname[MPI_MAX_PROCESSOR_NAME];
 
@@ -46,18 +55,51 @@ int main(int argc, char *argv[]) {
   MPI_Comm_size( MPI_COMM_WORLD, &size );
   MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
+  // left and right notes
+  up = (rank+size-1)%size;
+  down = (rank+1) % size;
+
+  //determine local grid size
+  //if rows cannot be divided evenly amongst the nodes
+  //then just add an extra row to each node that is less than the remainder
+  local_nrows = nx/size;
+  if(nx%size != 0) {
+    if(rank<nx%size)
+      local_nrows += 1;
+  }
+  local_ncols = ny;
+
+  //allocate space for massage buffers, local grid with extra rows
+  local_gridcurrent = (float *)malloc(sizeof(float*) * (local_nrows+2) * local_ncols);
+  local_gridnext = (float *)malloc(sizeof(float*) * (local_nrows+2) * local_ncols);
+  sendbuf = (float*)malloc(sizeof(float)*local_ncols);
+  recvbuf = (float*)malloc(sizeof(float)*local_ncols);
+
+  //initialize local gird
+  for(ii=1;ii<local_nrows-1;ii++){
+    for(jj=0;jj<local_ncols;jj++){
+      local_gridcurrent[jj+ii*local_ncols] = image[jj+ii*local_ncols];
+    }
+  }
+
+
+
+
   // Call the stencil kernel
   double tic = wtime();
+
   for (int t = 0; t < niters; ++t) {
-    stencil(nx, ny, image, tmp_image);
-    stencil(nx, ny, tmp_image, image);
+    startProcess(local_ncols, local_nrows, sendbuf, recvbuf, up, down, tag, local_gridcurrent, local_gridnext, status);
+    startProcess(local_ncols, local_nrows, sendbuf, recvbuf, up, down, tag, local_gridnext, local_gridcurrent, status);
   }
-  double toc = wtime();
   printf("Hello, world; from host %s: process %d of %d\n", hostname, rank, size);
+
+  double toc = wtime( );
   // Output
   printf("------------------------------------\n");
   printf(" runtime: %lf s\n", toc-tic);
   printf("------------------------------------\n");
+
   MPI_Finalize();
 
   output_image(OUTPUT_FILE, nx, ny, image);
@@ -65,6 +107,33 @@ int main(int argc, char *argv[]) {
   free(image);
 
   return EXIT_SUCCESS;
+}
+
+void startProcess(const int local_ncols, const int local_nrows, float *sendbuf, float *recvbuf, const int up, const int down, int tag, float *local_gridcurrent, float *local_gridnext, MPI_Status status){
+  //Exchange local grid halo rows
+  //first send up and receive down
+  for(int jj=0;jj<local_ncols;jj++)
+    sendbuf[jj] = local_gridcurrent[jj+local_ncols];
+
+  MPI_Sendrecv(sendbuf, local_ncols, MPI_FLOAT, up, tag,
+               recvbuf, local_ncols, MPI_FLOAT, down, tag,
+               MPI_COMM_WORLD, &status);
+
+  for(int jj=0;jj<local_ncols;jj++)
+    local_gridcurrent[jj+(local_nrows-2)*local_ncols] = recvbuf[jj];
+
+  //now send right receive left
+  for(int jj=0;jj<local_ncols;jj++)
+    sendbuf[jj] = local_gridcurrent[jj+(local_nrows-2)*local_ncols];
+
+  MPI_Sendrecv(sendbuf, local_ncols, MPI_FLOAT, down, tag,
+               recvbuf, local_ncols, MPI_FLOAT, up, tag,
+               MPI_COMM_WORLD, &status);
+
+  for(int jj=0;jj<local_ncols;jj++)
+    local_gridcurrent[jj] = recvbuf[jj];
+
+  stencil(local_nrows, local_ncols, local_gridcurrent, local_gridnext);
 }
 
 void stencil(const int nx, const int ny, float * restrict image, float * restrict tmp_image) {
