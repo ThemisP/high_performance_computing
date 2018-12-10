@@ -15,16 +15,27 @@ void startProcess(const int local_ncols, const int local_nrows, float *sendbuf, 
 double wtime(void);
 
 int main(int argc, char *argv[]) {
-  int ii, jj, kk;
+  enum bool {FALSE,TRUE};
+  char hostname[MPI_MAX_PROCESSOR_NAME];
   int rank,size,flag =0,strlen;
+  MPI_Init(&argc, &argv);
+  MPI_Initialized(&flag);
+  if(flag!=TRUE){
+    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
+  }
+  MPI_Get_processor_name(hostname,&strlen);
+
+  MPI_Comm_size( MPI_COMM_WORLD, &size );
+  MPI_Comm_rank( MPI_COMM_WORLD, &rank );
+
+  int ii, jj, kk;
   int tag =0;
   int up, down;
   MPI_Status status;
   int local_nrows, local_ncols, remote_ncols;
   float *local_gridcurrent, *local_gridnext, *sendbuf, *recvbuf, *printbuf;
 
-  enum bool {FALSE,TRUE};
-  char hostname[MPI_MAX_PROCESSOR_NAME];
+
 
 
   // Check usage
@@ -41,19 +52,7 @@ int main(int argc, char *argv[]) {
   // Allocate the image
   float *image = malloc(sizeof(float)*nx*ny);
   float *tmp_image = malloc(sizeof(float)*nx*ny);
-
-  // Set the input image
   init_image(nx, ny, image, tmp_image);
-
-  MPI_Init(&argc, &argv);
-  MPI_Initialized(&flag);
-  if(flag!=TRUE){
-    MPI_Abort(MPI_COMM_WORLD,EXIT_FAILURE);
-  }
-  MPI_Get_processor_name(hostname,&strlen);
-
-  MPI_Comm_size( MPI_COMM_WORLD, &size );
-  MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 
   // left and right notes
   up = (rank+size-1)%size;
@@ -70,21 +69,32 @@ int main(int argc, char *argv[]) {
   local_ncols = nx;
 
   //allocate space for message buffers, local grid with extra rows
-  local_gridcurrent = (float *)malloc(sizeof(float*) * (local_nrows+2) * local_ncols);
-  local_gridnext = (float *)malloc(sizeof(float*) * (local_nrows+2) * local_ncols);
+  local_gridcurrent = (float*)malloc(sizeof(float) * (local_nrows+2) * local_ncols);
+  local_gridnext = (float *)malloc(sizeof(float) * (local_nrows+2) * local_ncols);
   sendbuf = (float*)malloc(sizeof(float)*local_ncols);
   recvbuf = (float*)malloc(sizeof(float)*local_ncols);
   // gatherbuf = (float*)malloc(sizeof(float)*local_ncols);
 
-  //initialize local gird
+  //initialize local girds
   for(ii=1;ii<local_nrows-1;ii++){
     for(jj=0;jj<local_ncols;jj++){
       int remainder = ny%size;
-      if(rank<remainder || remainder==0)
+      if(rank<remainder || remainder==0){
         local_gridcurrent[jj + ii*local_ncols] = image[jj + (ii-1)*local_ncols + rank*(local_nrows-2)*local_ncols];
-      else
-        local_gridcurrent[jj + ii*local_ncols] = image[jj + (ii-1)*local_ncols + (remainder-1)*(local_nrows-1)*local_ncols + (rank-(remainder-1))*(local_nrows-2)*local_ncols];
-      printf("Process %d gets: -> %d\n", rank, image[jj + (ii-1)*local_ncols + rank*(local_nrows-2)*local_ncols]);
+        local_gridnext[jj + ii*local_ncols] = 0.0;
+      }else{
+        local_gridcurrent[jj + ii*local_ncols] = image[jj + (ii-1)*local_ncols + (remainder)*(local_nrows-1)*local_ncols + (rank-(remainder))*(local_nrows-2)*local_ncols];
+        local_gridnext[jj + ii*local_ncols] = 0.0;
+      }
+    }
+  }
+  if(rank == MASTER){
+    for(int jj =0; jj<local_ncols;jj++){
+      local_gridcurrent[jj] = 0.0;
+    }
+  } else if(rank == (size-1)){
+    for(int jj =0; jj<local_ncols;jj++){
+      local_gridcurrent[jj+(local_nrows-1)*local_ncols] = 0.0;
     }
   }
 
@@ -115,13 +125,15 @@ int main(int argc, char *argv[]) {
         int remainder = ny%size;
         if(j<remainder || remainder == 0){
           MPI_Recv(recvbuf, local_ncols, MPI_FLOAT, j, tag, MPI_COMM_WORLD, &status);
-          for(int jj=0;jj<local_ncols;jj++)
+          for(int jj=0;jj<local_ncols;jj++){
               image[jj + (i-1)*local_ncols + j*(local_nrows-2)*local_ncols] = recvbuf[jj];
+
+          }
         } else {
           if(i <local_nrows-2){
             MPI_Recv(recvbuf, local_ncols, MPI_FLOAT, j, tag, MPI_COMM_WORLD, &status);
             for(int jj = 0; jj<local_ncols;jj++)
-              image[jj + (i-1)*local_ncols + (remainder-1)*(local_nrows-2)*local_ncols + (rank-remainder-1)*(local_nrows-3)*local_ncols] = recvbuf[jj];
+              image[jj + (i-1)*local_ncols + (remainder)*(local_nrows-2)*local_ncols + (j-(remainder))*(local_nrows-3)*local_ncols] = recvbuf[jj];
           }
         }
       }
@@ -135,17 +147,18 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  printf("Process %d from host %s from a total of %d processes, has finished\n", rank, hostname, size);
+  //printf("Process %d from host %s from a total of %d processes, has finished\n", rank, hostname, size);
   // Output
   if(rank==MASTER){
     printf("------------------------------------\n");
+    printf(" Running for dimensions %dx%d at %d iterations:\n", nx,ny,niters);
     printf(" runtime: %lf s\n", toc-tic);
     printf("------------------------------------\n");
+
+    output_image(OUTPUT_FILE, nx, ny, image);
   }
 
   MPI_Finalize();
-
-  output_image(OUTPUT_FILE, nx, ny, image);
 
   free(image);
 
@@ -161,9 +174,9 @@ void startProcess(const int local_ncols, const int local_nrows, float *sendbuf, 
   MPI_Sendrecv(sendbuf, local_ncols, MPI_FLOAT, up, tag,
                recvbuf, local_ncols, MPI_FLOAT, down, tag,
                MPI_COMM_WORLD, &status);
-
-  for(int jj=0;jj<local_ncols;jj++)
-    local_gridcurrent[jj+(local_nrows-1)*local_ncols] = recvbuf[jj];
+  if(rank!=(size-1))
+    for(int jj=0;jj<local_ncols;jj++)
+      local_gridcurrent[jj+(local_nrows-1)*local_ncols] = recvbuf[jj];
 
   //now send down receive up
   for(int jj=0;jj<local_ncols;jj++)
@@ -172,9 +185,9 @@ void startProcess(const int local_ncols, const int local_nrows, float *sendbuf, 
   MPI_Sendrecv(sendbuf, local_ncols, MPI_FLOAT, down, tag,
                recvbuf, local_ncols, MPI_FLOAT, up, tag,
                MPI_COMM_WORLD, &status);
-
-  for(int jj=0;jj<local_ncols;jj++)
-    local_gridcurrent[jj] = recvbuf[jj];
+  if(rank!=MASTER)
+    for(int jj=0;jj<local_ncols;jj++)
+      local_gridcurrent[jj] = recvbuf[jj];
 
   stencil(local_nrows, local_ncols, local_gridcurrent, local_gridnext);
 }
@@ -186,7 +199,7 @@ void stencil(const int ny, const int nx, float * restrict image, float * restric
                     (image[i*nx+1] +
                      image[(i-1)*nx] +
                      image[(i+1)*nx])*0.1;
-    for(int j=0; j<nx; j++){
+    for(int j=1; j<nx-1; j++){
         tmp_image[j + i*nx] = image[j + i*nx]*0.6 +
                         (image[j-1 + i*nx] +
                          image[j-nx + i*nx] +
