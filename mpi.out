@@ -1,0 +1,231 @@
+Running on host node31-032
+Time is Mon Dec 10 21:09:20 GMT 2018
+Directory is /panfs/panasas01/cosc/tp16381/cw2
+PBS job ID is 7807568.master.cm.cluster
+This jobs runs on the following machines:
+node31-032
+------------------------------------
+ 2 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 4.703533 s
+------------------------------------
+------------------------------------
+ 2 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 1.275265 s
+------------------------------------
+------------------------------------
+ 2 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.067430 s
+------------------------------------
+------------------------------------
+ 3 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 3.463770 s
+------------------------------------
+------------------------------------
+ 3 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.934687 s
+------------------------------------
+------------------------------------
+ 3 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.047137 s
+------------------------------------
+------------------------------------
+ 4 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.597930 s
+------------------------------------
+------------------------------------
+ 4 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.701916 s
+------------------------------------
+------------------------------------
+ 4 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.035378 s
+------------------------------------
+------------------------------------
+ 5 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.539198 s
+------------------------------------
+------------------------------------
+ 5 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.677037 s
+------------------------------------
+------------------------------------
+ 5 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.028669 s
+------------------------------------
+------------------------------------
+ 6 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.652431 s
+------------------------------------
+------------------------------------
+ 6 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.707319 s
+------------------------------------
+------------------------------------
+ 6 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.024097 s
+------------------------------------
+------------------------------------
+ 7 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.236774 s
+------------------------------------
+------------------------------------
+ 7 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.603401 s
+------------------------------------
+------------------------------------
+ 7 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.021081 s
+------------------------------------
+------------------------------------
+ 8 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 1.987475 s
+------------------------------------
+------------------------------------
+ 8 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.548496 s
+------------------------------------
+------------------------------------
+ 8 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.019807 s
+------------------------------------
+------------------------------------
+ 9 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.135992 s
+------------------------------------
+------------------------------------
+ 9 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.570416 s
+------------------------------------
+------------------------------------
+ 9 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.016586 s
+------------------------------------
+------------------------------------
+ 10 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 1.997072 s
+------------------------------------
+------------------------------------
+ 10 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.526108 s
+------------------------------------
+------------------------------------
+ 10 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.014991 s
+------------------------------------
+------------------------------------
+ 11 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.176519 s
+------------------------------------
+------------------------------------
+ 11 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.587681 s
+------------------------------------
+------------------------------------
+ 11 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.013723 s
+------------------------------------
+------------------------------------
+ 12 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 1.983303 s
+------------------------------------
+------------------------------------
+ 12 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.534658 s
+------------------------------------
+------------------------------------
+ 12 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.013112 s
+------------------------------------
+------------------------------------
+ 13 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.088042 s
+------------------------------------
+------------------------------------
+ 13 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.569933 s
+------------------------------------
+------------------------------------
+ 13 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.012236 s
+------------------------------------
+------------------------------------
+ 14 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 1.955947 s
+------------------------------------
+------------------------------------
+ 14 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.530799 s
+------------------------------------
+------------------------------------
+ 14 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.011578 s
+------------------------------------
+------------------------------------
+ 15 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 2.104272 s
+------------------------------------
+------------------------------------
+ 15 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.566220 s
+------------------------------------
+------------------------------------
+ 15 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.010855 s
+------------------------------------
+------------------------------------
+ 16 CORES USED
+ Running for dimensions 8000x8000 at 100 iterations:
+ runtime: 1.943956 s
+------------------------------------
+------------------------------------
+ 16 CORES USED
+ Running for dimensions 4096x4096 at 100 iterations:
+ runtime: 0.534434 s
+------------------------------------
+------------------------------------
+ 16 CORES USED
+ Running for dimensions 1024x1024 at 100 iterations:
+ runtime: 0.010944 s
+------------------------------------

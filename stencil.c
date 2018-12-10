@@ -151,6 +151,7 @@ int main(int argc, char *argv[]) {
   // Output
   if(rank==MASTER){
     printf("------------------------------------\n");
+    printf(" %d CORES USED\n", size);
     printf(" Running for dimensions %dx%d at %d iterations:\n", nx,ny,niters);
     printf(" runtime: %lf s\n", toc-tic);
     printf("------------------------------------\n");
